@@ -1,4 +1,4 @@
-package dev.thanhliem.oauth.entities.models;
+package dev.thanhliem.oauth.models.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

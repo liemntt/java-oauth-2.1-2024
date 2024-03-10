@@ -1,6 +1,6 @@
 package dev.thanhliem.oauth.repositories.mappers;
 
-import dev.thanhliem.oauth.entities.models.User;
+import dev.thanhliem.oauth.models.entities.User;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
