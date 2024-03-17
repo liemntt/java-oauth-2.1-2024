@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,10 +14,10 @@ public class User {
     private Long id;
     private LocalDate birthday;
     private String createdBy;
-    private ZonedDateTime createdDate;
+    private OffsetDateTime createdDate;
     private String username;
     private String password;
     private String email;
     private String updatedBy;
-    private ZonedDateTime updatedDate;
+    private OffsetDateTime updatedDate;
 }

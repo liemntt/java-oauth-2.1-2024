@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.ZonedDateTime;
+import java.time.OffsetDateTime;
 
 @Data
 @NoArgsConstructor
@@ -14,7 +14,7 @@ public class Role {
     private Long id;
     private String name;
     private String createdBy;
-    private ZonedDateTime createdDate;
+    private OffsetDateTime createdDate;
     private String updatedBy;
-    private ZonedDateTime updatedDate;
+    private OffsetDateTime updatedDate;
 }
