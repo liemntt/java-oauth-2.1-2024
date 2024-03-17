@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dev.thanhliem.oauth.repositories.mappers.UserRepository">
+    <insert id="signUp" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO public.user ("birthDay", "email", "password", "username")
+        VALUES( #{user.birthday}, #{user.email}, #{user.password}, #{user.username})
+    </insert>
+    <insert id="insertRelationship">
+        INSERT INTO public.users_roles (user_id, role_id)
+        VALUES (#{userId}, #{roleId})
+    </insert>
+    <select id="getAllUsers" resultType="dev.thanhliem.oauth.models.entities.User">
+        SELECT * FROM public.user
+    </select>
+    <select id="find" resultType="dev.thanhliem.oauth.models.entities.User">
+        SELECT * FROM public.user WHERE id = #{id} LIMIT 1
+    </select>
+    <select id="findByUsernameOrEmail" resultType="dev.thanhliem.oauth.models.entities.User">
+        SELECT * FROM public.user WHERE username = #{username} OR email = #{username} LIMIT 1
+    </select>
+    <select id="isExistUsernameOrEmail" resultType="java.lang.Boolean">
+        SELECT 1
+        FROM
+            public.user
+        WHERE
+            username = #{username} OR email = #{email}
+    </select>
+</mapper>
