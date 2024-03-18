@@ -16,4 +16,10 @@ public final class Constants {
         public static final String ADMIN = "ADMIN";
         public static final String USER = "USER";
     }
+
+    public static class Headers {
+        private Headers() { throw new IllegalStateException(UTILITY_CLASSES);}
+
+        public static final String AUTHORIZATION = "Authorization";
+    }
 }
