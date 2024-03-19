@@ -8,14 +8,14 @@ import dev.thanhliem.oauth.models.entities.User;
 import dev.thanhliem.oauth.models.payloads.SignInPayload;
 import dev.thanhliem.oauth.models.payloads.SignUpPayload;
 import dev.thanhliem.oauth.models.payloads.UserPayload;
-import dev.thanhliem.oauth.models.responses.SignInResponse;
+import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
 import dev.thanhliem.oauth.repositories.mappers.RoleRepository;
 import dev.thanhliem.oauth.repositories.mappers.UserRepository;
+import dev.thanhliem.oauth.security.JwtTokenProvider;
 import dev.thanhliem.oauth.services.resources.UserService;
 import dev.thanhliem.oauth.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper mapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider provider;
 
     @Override
     public List<User> getAllUsers() {
@@ -65,8 +66,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SignInResponse signIn(SignInPayload payload, AuthenticationManager manager) {
-        return null;
+    public RequestTokenResponse signIn(SignInPayload payload) {
+        if (Utils.nullOrBlank(payload.usernameOrEmail())) {
+            throw new UsernameNotFoundException("Username or email cannot be null or blank");
+        }
+        if (Utils.nullOrBlank(payload.password())) {
+            throw new ApplicationException("Password cannot be null or blank");
+        }
+        var user = repository.findByUsernameOrEmail(payload.usernameOrEmail());
+        if (user == null) {
+            throw new UsernameNotFoundException("Invalid Username/email");
+        }
+        if (passwordEncoder.matches(payload.password(), user.getPassword())) {
+            var resp = new RequestTokenResponse();
+            var token = provider.generate(user.getUsername());
+            resp.setAccessToken(token);
+            return resp;
+        }
+        throw new ApplicationException("Invalid password");
     }
 
     @Override

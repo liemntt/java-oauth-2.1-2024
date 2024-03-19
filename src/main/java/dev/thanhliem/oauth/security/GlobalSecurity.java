@@ -1,23 +1,23 @@
 package dev.thanhliem.oauth.security;
 
 import dev.thanhliem.oauth.constants.Endpoints;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.io.IOException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
-public class GlobalSecurity implements AuthenticationEntryPoint {
+@RequiredArgsConstructor
+public class GlobalSecurity {
+
+    private final JwtTokenAuthenticationEntryPoint jwtTokenAuthenticationEntryPoint;
+    private final JwtTokenFilter jwtTokenFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -27,15 +27,15 @@ public class GlobalSecurity implements AuthenticationEntryPoint {
                 custom -> custom
                     .requestMatchers(Endpoints.UserApi.SIGN_UP)
                     .permitAll()
+                    .requestMatchers(Endpoints.UserApi.SIGNING)
+                    .permitAll()
                     .anyRequest()
                     .authenticated()
             )
+            .exceptionHandling(s -> s.authenticationEntryPoint(jwtTokenAuthenticationEntryPoint))
+            .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
             ;
         return http.build();
-    }
-
-    @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        // not impl yet
     }
 }

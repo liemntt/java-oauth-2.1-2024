@@ -4,8 +4,7 @@ import dev.thanhliem.oauth.models.entities.User;
 import dev.thanhliem.oauth.models.payloads.SignInPayload;
 import dev.thanhliem.oauth.models.payloads.SignUpPayload;
 import dev.thanhliem.oauth.models.payloads.UserPayload;
-import dev.thanhliem.oauth.models.responses.SignInResponse;
-import org.springframework.security.authentication.AuthenticationManager;
+import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
@@ -18,5 +17,5 @@ public interface UserService extends UserDetailsService {
 
     UserPayload signUp(SignUpPayload payload);
 
-    SignInResponse signIn(SignInPayload payload, AuthenticationManager manager);
+    RequestTokenResponse signIn(SignInPayload payload);
 }

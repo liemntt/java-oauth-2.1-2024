@@ -5,6 +5,7 @@ import dev.thanhliem.oauth.models.entities.User;
 import dev.thanhliem.oauth.models.payloads.SignInPayload;
 import dev.thanhliem.oauth.models.payloads.SignUpPayload;
 import dev.thanhliem.oauth.models.payloads.UserPayload;
+import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
 import dev.thanhliem.oauth.services.resources.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,14 +40,14 @@ public class UserApis {
     @PostMapping(value = Endpoints.UserApi.SIGN_UP,
         headers = {Endpoints.HEADER_VERSION},
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> signUp(@RequestBody SignUpPayload payload) {
+    public ResponseEntity<UserPayload> signUp(@RequestBody SignUpPayload payload) {
         return ResponseEntity.ok(service.signUp(payload));
     }
 
     @PostMapping(value = Endpoints.UserApi.SIGNING,
         headers = {Endpoints.HEADER_VERSION},
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> signIn(@RequestBody SignInPayload payload) {
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<RequestTokenResponse> signIn(@RequestBody SignInPayload payload) {
+        return ResponseEntity.ok(service.signIn(payload));
     }
 }
