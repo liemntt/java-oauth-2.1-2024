@@ -11,5 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class RequestTokenResponse {
     private String accessToken;
+    private String expiresIn;
     private String type = "Bearer";
 }

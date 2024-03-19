@@ -9,6 +9,7 @@ import dev.thanhliem.oauth.models.payloads.SignInPayload;
 import dev.thanhliem.oauth.models.payloads.SignUpPayload;
 import dev.thanhliem.oauth.models.payloads.UserPayload;
 import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
+import dev.thanhliem.oauth.properties.AuthenticateProperties;
 import dev.thanhliem.oauth.repositories.mappers.RoleRepository;
 import dev.thanhliem.oauth.repositories.mappers.UserRepository;
 import dev.thanhliem.oauth.security.JwtTokenProvider;
@@ -21,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.List;
 
 @Slf4j
@@ -33,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider provider;
+    private final AuthenticateProperties authenticateProperties;
 
     @Override
     public List<User> getAllUsers() {
@@ -81,6 +84,8 @@ public class UserServiceImpl implements UserService {
             var resp = new RequestTokenResponse();
             var token = provider.generate(user.getUsername());
             resp.setAccessToken(token);
+            long duration = Duration.ofMillis(authenticateProperties.getExpiredTime()).toSeconds();
+            resp.setExpiresIn(String.valueOf(duration));
             return resp;
         }
         throw new ApplicationException("Invalid password");
