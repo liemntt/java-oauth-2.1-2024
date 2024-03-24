@@ -1,5 +1,6 @@
 package dev.thanhliem.oauth.security;
 
+import dev.thanhliem.oauth.constants.ErrorCodes;
 import dev.thanhliem.oauth.exceptions.ApplicationException;
 import dev.thanhliem.oauth.properties.AuthenticateProperties;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -53,15 +54,15 @@ public class JwtTokenProvider {
                 .parse(token);
             return true;
         } catch (MalformedJwtException e) {
-            throw new ApplicationException("Invalid token");
+            throw new ApplicationException(ErrorCodes.UNAUTHORIZED, "Invalid token");
         } catch (ExpiredJwtException e) {
-            throw new ApplicationException("Expired token");
+            throw new ApplicationException(ErrorCodes.UNAUTHORIZED, "Expired token");
         } catch (SignatureException e) {
-            throw new ApplicationException("Cannot verify token");
+            throw new ApplicationException(ErrorCodes.UNAUTHORIZED, "Cannot verify token");
         } catch (SecurityException e) {
-            throw new ApplicationException("Unsupported token");
+            throw new ApplicationException(ErrorCodes.UNAUTHORIZED, "Unsupported token");
         } catch (IllegalArgumentException e) {
-            throw new ApplicationException("Token is null or empty");
+            throw new ApplicationException(ErrorCodes.UNAUTHORIZED, "Token is null or empty");
         }
     }
 }

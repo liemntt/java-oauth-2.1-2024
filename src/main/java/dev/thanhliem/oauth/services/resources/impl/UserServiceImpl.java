@@ -1,6 +1,7 @@
 package dev.thanhliem.oauth.services.resources.impl;
 
 import dev.thanhliem.oauth.constants.Constants;
+import dev.thanhliem.oauth.constants.ErrorCodes;
 import dev.thanhliem.oauth.constants.ErrorMessages;
 import dev.thanhliem.oauth.exceptions.ApplicationException;
 import dev.thanhliem.oauth.exceptions.BadRequestException;
@@ -58,12 +59,12 @@ public class UserServiceImpl implements UserService {
     public UserPayload signUp(SignUpPayload payload) {
         var isExistWrapper = repository.isExistUsernameOrEmail(payload.getUsername(), payload.getEmail());
         if (isExistWrapper.isPresent()) {
-            throw new ApplicationException("Username %s or email %s existed".formatted(payload.getUsername(), payload.getEmail()));
+            throw new ApplicationException(ErrorCodes.USERNAME_EXISTED, "Username %s or email %s existed".formatted(payload.getUsername(), payload.getEmail()));
         }
         User user = mapper.toUser(payload);
         user.setPassword(passwordEncoder.encode(payload.getPassword()));
         var role = roleRepository.findByName(Constants.Roles.USER)
-                .orElseThrow(() -> new ApplicationException("Default roles not found."));
+                .orElseThrow(() -> new ApplicationException(ErrorCodes.ROLES_NOT_FOUND, "Default roles not found."));
 
         repository.signUp(user);
         repository.insertRelationship(user.getId(), role.getId());
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
             throw new UsernameNotFoundException("Username or email cannot be null or blank");
         }
         if (Utils.nullOrBlank(payload.password())) {
-            throw new ApplicationException("Password cannot be null or blank");
+            throw new ApplicationException(ErrorCodes.INVALID_PAYLOAD, "Password cannot be null or blank");
         }
         var mayBeUser = repository.findByUsernameOrEmail(payload.usernameOrEmail());
         if (mayBeUser.isEmpty()) {
@@ -92,18 +93,18 @@ public class UserServiceImpl implements UserService {
             resp.setExpiresIn(String.valueOf(duration));
             return resp;
         }
-        throw new ApplicationException("Invalid password");
+        throw new ApplicationException(ErrorCodes.PASSWORD_MISMATCH, "Invalid password");
     }
 
     @Override
     public UserPayload resetPassword(ResetPasswordPayload payload) {
         if (payload == null || Utils.nullOrEmpty(payload.getUsernameOrEmail()) || payload.getBirthDate() == null) {
-            throw new BadRequestException("Invalid payload");
+            throw new BadRequestException(ErrorCodes.INVALID_PAYLOAD, "Invalid payload", "Invalid payload");
         }
 
         var mayBeUser = repository.findByUsernameOrEmail(payload.getUsernameOrEmail());
         if (mayBeUser.isEmpty()) {
-            throw new BadRequestException(ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
+            throw new BadRequestException(ErrorCodes.USER_NOT_FOUND, ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
         }
         var user = mayBeUser.get();
         if (user.getBirthday().isEqual(payload.getBirthDate())) {
@@ -111,7 +112,7 @@ public class UserServiceImpl implements UserService {
             return mapper.toPayload(user);
         }
 
-        throw new BadRequestException(ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
+        throw new BadRequestException(ErrorCodes.USER_NOT_FOUND, ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
     }
 
     @Override
