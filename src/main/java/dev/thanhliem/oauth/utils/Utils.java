@@ -7,6 +7,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import dev.thanhliem.oauth.constants.Constants;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Collection;
+
 @Slf4j
 public final class Utils {
 
@@ -38,6 +40,14 @@ public final class Utils {
 
     public static boolean nonBlank(String str) {
         return !nullOrBlank(str);
+    }
+
+    public static boolean nullOrEmpty(Collection<?> collection) {
+        return collection == null || collection.isEmpty();
+    }
+
+    public static boolean nonEmpty(Collection<?> collection) {
+        return !nullOrEmpty(collection);
     }
 
     public static String toJson(Object object) {
