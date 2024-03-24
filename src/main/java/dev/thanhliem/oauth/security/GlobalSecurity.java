@@ -11,6 +11,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.List;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -25,9 +27,7 @@ public class GlobalSecurity {
             .cors(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(
                 custom -> custom
-                    .requestMatchers(Endpoints.UserApi.SIGN_UP)
-                    .permitAll()
-                    .requestMatchers(Endpoints.UserApi.SIGNING)
+                    .requestMatchers(permitRequests())
                     .permitAll()
                     .anyRequest()
                     .authenticated()
@@ -35,7 +35,14 @@ public class GlobalSecurity {
             .exceptionHandling(s -> s.authenticationEntryPoint(jwtTokenAuthenticationEntryPoint))
             .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-            ;
+        ;
         return http.build();
+    }
+
+    private String[] permitRequests() {
+        return List.of(Endpoints.UserApi.SIGN_UP,
+                Endpoints.UserApi.SIGNING,
+                Endpoints.UserApi.RESET_PASSWORD).
+            toArray(String[]::new);
     }
 }

@@ -14,7 +14,7 @@ public interface UserRepository {
 
     User find(@Param(value = "id") long id);
 
-    User findByUsernameOrEmail(@Param(value = "username") String username);
+    Optional<User> findByUsernameOrEmail(@Param(value = "username") String username);
 
     Optional<Boolean> isExistUsernameOrEmail(@Param(value = "username") String username, @Param(value = "email") String email);
 

@@ -2,6 +2,7 @@ package dev.thanhliem.oauth.apis;
 
 import dev.thanhliem.oauth.constants.Endpoints;
 import dev.thanhliem.oauth.models.entities.User;
+import dev.thanhliem.oauth.models.payloads.ResetPasswordPayload;
 import dev.thanhliem.oauth.models.payloads.SignInPayload;
 import dev.thanhliem.oauth.models.payloads.SignUpPayload;
 import dev.thanhliem.oauth.models.payloads.UserPayload;
@@ -32,7 +33,7 @@ public class UserApis {
     @GetMapping(value = Endpoints.UserApi.GET_USER_BY_ID,
         headers = {Endpoints.HEADER_VERSION},
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> find(@PathVariable(value = "id")long id) {
+    public ResponseEntity<UserPayload> find(@PathVariable(value = "id")long id) {
         UserPayload result = service.find(id);
         return ResponseEntity.ok(result);
     }
@@ -49,5 +50,12 @@ public class UserApis {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<RequestTokenResponse> signIn(@RequestBody SignInPayload payload) {
         return ResponseEntity.ok(service.signIn(payload));
+    }
+
+    @PostMapping(value = Endpoints.UserApi.RESET_PASSWORD,
+    headers = {Endpoints.HEADER_VERSION},
+    produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserPayload> resetPassword(@RequestBody ResetPasswordPayload payload) {
+        return ResponseEntity.ok(service.resetPassword(payload));
     }
 }

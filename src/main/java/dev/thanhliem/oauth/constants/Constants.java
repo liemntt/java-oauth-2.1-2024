@@ -21,5 +21,7 @@ public final class Constants {
         private Headers() { throw new IllegalStateException(UTILITY_CLASSES);}
 
         public static final String AUTHORIZATION = "Authorization";
+
+        public static final String KEY_VERSION = "X-Api-Versioning";
     }
 }

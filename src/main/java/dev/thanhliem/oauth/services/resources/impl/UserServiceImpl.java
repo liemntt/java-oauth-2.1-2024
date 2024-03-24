@@ -1,10 +1,13 @@
 package dev.thanhliem.oauth.services.resources.impl;
 
 import dev.thanhliem.oauth.constants.Constants;
+import dev.thanhliem.oauth.constants.ErrorMessages;
 import dev.thanhliem.oauth.exceptions.ApplicationException;
+import dev.thanhliem.oauth.exceptions.BadRequestException;
 import dev.thanhliem.oauth.exceptions.ResourceNotFoundException;
 import dev.thanhliem.oauth.mappers.UserMapper;
 import dev.thanhliem.oauth.models.entities.User;
+import dev.thanhliem.oauth.models.payloads.ResetPasswordPayload;
 import dev.thanhliem.oauth.models.payloads.SignInPayload;
 import dev.thanhliem.oauth.models.payloads.SignUpPayload;
 import dev.thanhliem.oauth.models.payloads.UserPayload;
@@ -76,10 +79,11 @@ public class UserServiceImpl implements UserService {
         if (Utils.nullOrBlank(payload.password())) {
             throw new ApplicationException("Password cannot be null or blank");
         }
-        var user = repository.findByUsernameOrEmail(payload.usernameOrEmail());
-        if (user == null) {
+        var mayBeUser = repository.findByUsernameOrEmail(payload.usernameOrEmail());
+        if (mayBeUser.isEmpty()) {
             throw new UsernameNotFoundException("Invalid Username/email");
         }
+        var user = mayBeUser.get();
         if (passwordEncoder.matches(payload.password(), user.getPassword())) {
             var resp = new RequestTokenResponse();
             var token = provider.generate(user.getUsername());
@@ -92,14 +96,34 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserPayload resetPassword(ResetPasswordPayload payload) {
+        if (payload == null || Utils.nullOrEmpty(payload.getUsernameOrEmail()) || payload.getBirthDate() == null) {
+            throw new BadRequestException("Invalid payload");
+        }
+
+        var mayBeUser = repository.findByUsernameOrEmail(payload.getUsernameOrEmail());
+        if (mayBeUser.isEmpty()) {
+            throw new BadRequestException(ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
+        }
+        var user = mayBeUser.get();
+        if (user.getBirthday().isEqual(payload.getBirthDate())) {
+            log.info("[UserService.resetPassword] found matched user {}.", Utils.toJson(user));
+            return mapper.toPayload(user);
+        }
+
+        throw new BadRequestException(ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (Utils.nullOrBlank(username)) {
             throw new UsernameNotFoundException("Username or email cannot be null or blank");
         }
-        var user = repository.findByUsernameOrEmail(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Cannot find user %s".formatted(username));
+        var mayBeUser = repository.findByUsernameOrEmail(username);
+        if (mayBeUser.isEmpty()) {
+            throw new UsernameNotFoundException(ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(username));
         }
+        var user = mayBeUser.get();
         return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
             .password(user.getPassword())
             .authorities("ADMIN")
