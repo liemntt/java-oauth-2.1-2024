@@ -20,6 +20,7 @@ public class EmailApis {
         headers = {Endpoints.HEADER_VERSION},
         produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> sendMail() {
-        return ResponseEntity.ok(service.send());
+        service.sendNewPassword("", "thanh-liem", "new-password");
+        return ResponseEntity.ok("OK");
     }
 }
