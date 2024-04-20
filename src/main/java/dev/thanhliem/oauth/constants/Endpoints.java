@@ -23,6 +23,15 @@ public class Endpoints {
         public static final String RESET_PASSWORD = GET_ALL_USERS + "/reset";
     }
 
+    public static class EmailApi {
+
+        private EmailApi() {
+            throw new IllegalStateException(Constants.UTILITY_CLASSES);
+        }
+        public static final String PATH = API_PREFIX + "/email";
+        public static final String SEND = PATH + "/send";
+    }
+
     public static class InfoApi {
 
         private InfoApi() {
