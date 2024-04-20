@@ -1,0 +1,54 @@
+@host = http://localhost:8080/api
+@version = 1
+
+# @name tokenRequest
+POST {{host}}/users/signing HTTP/1.1
+X-Api-Versioning : {{version}}
+Content-Type : application/json
+
+{
+    "usernameOrEmail": "thanhliem",
+    "password": "thanhliem"
+}
+### token
+@token = Bearer {{tokenRequest.response.body.accessToken}}
+### send mail
+
+# @name sendEmail
+GET {{host}}/email/send HTTP/1.1
+X-Api-Versioning : {{version}}
+Content-Type : application/json
+Authorization: {{token}}
+
+{
+    "usernameOrEmail": "thanhliem",
+    "password": "thanhliem"
+}
+
+### reset password
+# @name resetPassword
+POST {{host}}/users/reset HTTP/1.1
+X-Api-Versioning : {{version}}
+Content-Type : application/json
+
+{
+    "usernameOrEmail": "thanhliem",
+    "birthDate": "1992-06-02"
+}
+
+### change password
+# @name updatePassword
+# @prompt id userId need to be input
+# @prompt oldPassword oldPassword need to be input
+# @prompt newPassword newPassword need to be input
+
+
+PUT  {{host}}/users/{{id}}/password
+X-Api-Versioning : {{version}}
+Content-Type : application/json
+Authorization: {{token}}
+
+{
+    "oldPassword": "{{oldPassword}}",
+    "newPassword": "{{newPassword}}"
+}
