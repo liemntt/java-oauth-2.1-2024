@@ -7,7 +7,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import dev.thanhliem.oauth.constants.Constants;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Collection;
+import java.util.*;
+import java.util.stream.IntStream;
 
 @Slf4j
 public final class Utils {
@@ -17,6 +18,8 @@ public final class Utils {
     }
 
     private static final JsonMapper JSON_MAPPER;
+
+    public static final Random BASIC_RANDOM = new Random();
 
     static {
         JSON_MAPPER = JsonMapper.builder()
@@ -57,8 +60,53 @@ public final class Utils {
             }
             return JSON_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            log.warn("[toJson] Cannot parse object. Error %s".formatted(e.getMessage()), e);
+            log.warn("[toJson] Cannot parse object %s. Error %s".formatted(object.toString(), e.getMessage()), e);
             return null;
         }
+    }
+
+    public static String generatePassword(int length) {
+        if (length < Constants.PASSWORD_LENGTH_MIN) {
+            length = Constants.PASSWORD_LENGTH_MIN;
+        }
+        if (length > Constants.PASSWORD_LENGTH_MAX) {
+            length = Constants.PASSWORD_LENGTH_MAX;
+        }
+        StringBuilder passwordBuilder = new StringBuilder(length);
+        int numberChars = length % 4;
+        String randomLowerChar = generateRandomString(Constants.CHARACTERS_LOWER_CASE, numberChars);
+        passwordBuilder.append(randomLowerChar);
+
+        String randomUpperChar = generateRandomString(Constants.CHARACTERS_UPPER_CASE, numberChars);
+        passwordBuilder.append(randomUpperChar);
+
+        String randomDigits = generateRandomString(Constants.DIGITS, numberChars);
+        passwordBuilder.append(randomDigits);
+
+        String randomSpecial = generateRandomString(Constants.OTHER_SPECIAL, numberChars);
+        passwordBuilder.append(randomSpecial);
+
+        String randomAllowed = generateRandomString(Constants.PASSWORD_ALLOWED, length - passwordBuilder.length());
+        if (nonEmpty(randomAllowed)) {
+            passwordBuilder.append(randomAllowed);
+        }
+        List<String> chars = Arrays.asList(passwordBuilder.toString().split(""));
+        Collections.shuffle(chars);
+        return String.join("", chars);
+    }
+
+    public static String generateRandomString(String input, int number) {
+        if (nullOrBlank(input) || number < 0) {
+            throw new IllegalArgumentException("Invalid input");
+        }
+        if (number == 0) {
+            return "";
+        }
+        StringBuilder randomStrBuilder = new StringBuilder(number);
+        IntStream.range(0, number).forEach(i -> {
+            var position = BASIC_RANDOM.nextInt(0, input.length());
+            randomStrBuilder.append(input.charAt(position));
+        });
+        return randomStrBuilder.toString();
     }
 }
