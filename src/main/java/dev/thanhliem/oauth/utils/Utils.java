@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import dev.thanhliem.oauth.constants.Constants;
 import lombok.extern.slf4j.Slf4j;
 
+import java.security.SecureRandom;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -19,7 +20,7 @@ public final class Utils {
 
     private static final JsonMapper JSON_MAPPER;
 
-    public static final Random BASIC_RANDOM = new Random();
+    public static final SecureRandom BASIC_RANDOM = new SecureRandom();
 
     static {
         JSON_MAPPER = JsonMapper.builder()
