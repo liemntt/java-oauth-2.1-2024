@@ -12,11 +12,13 @@ public interface UserRepository {
 
     int signUp(@Param(value = "user") User user);
 
-    User find(@Param(value = "id") long id);
+    Optional<User> find(@Param(value = "id") long id);
 
     Optional<User> findByUsernameOrEmail(@Param(value = "username") String username);
 
     Optional<Boolean> isExistUsernameOrEmail(@Param(value = "username") String username, @Param(value = "email") String email);
 
     int insertRelationship(@Param("userId")Long userId, @Param("roleId") Long roleId);
+
+    int update(@Param(value = "user") User user);
 }

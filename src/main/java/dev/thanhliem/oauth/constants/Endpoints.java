@@ -21,6 +21,7 @@ public class Endpoints {
         public static final String SIGN_UP = GET_ALL_USERS + "/signup";
         public static final String SIGNING = GET_ALL_USERS + "/signing";
         public static final String RESET_PASSWORD = GET_ALL_USERS + "/reset";
+        public static final String UPDATE_PASSWORD = GET_USER_BY_ID + "/password";
     }
 
     public static class EmailApi {

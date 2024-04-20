@@ -9,6 +9,17 @@
         INSERT INTO public.users_roles (user_id, role_id)
         VALUES (#{userId}, #{roleId})
     </insert>
+    <update id="update">
+        UPDATE
+            public.user
+        SET
+            "email" = #{user.email},
+            "birthDay" = #{user.birthday},
+            "username" = #{user.username},
+            "password" = #{user.password}
+        WHERE
+            "id" = #{user.id}
+    </update>
     <select id="getAllUsers" resultType="dev.thanhliem.oauth.models.entities.User">
         SELECT * FROM public.user
     </select>
