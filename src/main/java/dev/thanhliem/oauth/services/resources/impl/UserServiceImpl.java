@@ -8,15 +8,13 @@ import dev.thanhliem.oauth.exceptions.BadRequestException;
 import dev.thanhliem.oauth.exceptions.ResourceNotFoundException;
 import dev.thanhliem.oauth.mappers.UserMapper;
 import dev.thanhliem.oauth.models.entities.User;
-import dev.thanhliem.oauth.models.payloads.ResetPasswordPayload;
-import dev.thanhliem.oauth.models.payloads.SignInPayload;
-import dev.thanhliem.oauth.models.payloads.SignUpPayload;
-import dev.thanhliem.oauth.models.payloads.UserPayload;
+import dev.thanhliem.oauth.models.payloads.*;
 import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
 import dev.thanhliem.oauth.properties.AuthenticateProperties;
 import dev.thanhliem.oauth.repositories.mappers.RoleRepository;
 import dev.thanhliem.oauth.repositories.mappers.UserRepository;
 import dev.thanhliem.oauth.security.JwtTokenProvider;
+import dev.thanhliem.oauth.services.functions.EmailService;
 import dev.thanhliem.oauth.services.resources.UserService;
 import dev.thanhliem.oauth.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider provider;
     private final AuthenticateProperties authenticateProperties;
+    private final EmailService emailService;
 
     @Override
     public List<User> getAllUsers() {
@@ -48,11 +47,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserPayload find(long id) {
-        User user = repository.find(id);
-        if (user == null) {
+        var mayBeUser = repository.find(id);
+        if (mayBeUser.isEmpty()) {
             throw new ResourceNotFoundException("User", "id", id);
         }
-        return mapper.toPayload(user);
+        return mapper.toPayload(mayBeUser.get());
     }
 
     @Override
@@ -93,13 +92,13 @@ public class UserServiceImpl implements UserService {
             resp.setExpiresIn(String.valueOf(duration));
             return resp;
         }
-        throw new ApplicationException(ErrorCodes.PASSWORD_MISMATCH, "Invalid password");
+        throw new ApplicationException(ErrorCodes.PASSWORD_MISMATCH, ErrorMessages.INVALID_PASSWORD);
     }
 
     @Override
     public UserPayload resetPassword(ResetPasswordPayload payload) {
         if (payload == null || Utils.nullOrEmpty(payload.getUsernameOrEmail()) || payload.getBirthDate() == null) {
-            throw new BadRequestException(ErrorCodes.INVALID_PAYLOAD, "Invalid payload", "Invalid payload");
+            throw new BadRequestException(ErrorCodes.INVALID_PAYLOAD, ErrorMessages.INVALID_PAYLOAD, "Invalid payload %s".formatted(Utils.toJson(payload)));
         }
 
         var mayBeUser = repository.findByUsernameOrEmail(payload.getUsernameOrEmail());
@@ -109,10 +108,38 @@ public class UserServiceImpl implements UserService {
         var user = mayBeUser.get();
         if (user.getBirthday().isEqual(payload.getBirthDate())) {
             log.info("[UserService.resetPassword] found matched user {}.", Utils.toJson(user));
+            var newPassword = Utils.generatePassword(15);
+            user.setPassword(passwordEncoder.encode(newPassword));
+            repository.update(user);
+            emailService.sendResetPassword(user.getEmail(), user.getUsername(), newPassword);
+            log.info("[UserService.resetPassword] User {} reset the password succeeds .", Utils.toJson(user));
             return mapper.toPayload(user);
         }
 
         throw new BadRequestException(ErrorCodes.USER_NOT_FOUND, ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
+    }
+
+    @Override
+    public UserPayload updatePassword(Long id, UpdatePasswordPayload payload) {
+        if (payload == null || Utils.nullOrEmpty(payload.oldPassword()) || Utils.nullOrEmpty(payload.newPassword()) || id == null) {
+            var payloadStr = Utils.toJson(payload);
+            log.warn("[updatePassword] invalid payload {}", payloadStr);
+            throw new BadRequestException(ErrorCodes.INVALID_PAYLOAD, "Invalid payload", "Invalid payload %s".formatted(payloadStr));
+        }
+        var mayBeUser = repository.find(id);
+        if (mayBeUser.isEmpty()) {
+            throw new ResourceNotFoundException("User", "id", id);
+        }
+
+        var user = mayBeUser.get();
+        if (passwordEncoder.matches(payload.oldPassword(), user.getPassword())) {
+            // TODO check password strong or not
+            user.setPassword(passwordEncoder.encode(payload.newPassword()));
+            repository.update(user);
+            emailService.sendNewPassword(user.getEmail(), user.getUsername(), payload.newPassword());
+            return mapper.toPayload(user);
+        }
+        throw new BadRequestException(ErrorCodes.PASSWORD_MISMATCH, ErrorMessages.INVALID_PASSWORD, "Your old password not matched");
     }
 
     @Override

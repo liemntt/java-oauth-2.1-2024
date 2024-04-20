@@ -1,10 +1,7 @@
 package dev.thanhliem.oauth.services.resources;
 
 import dev.thanhliem.oauth.models.entities.User;
-import dev.thanhliem.oauth.models.payloads.ResetPasswordPayload;
-import dev.thanhliem.oauth.models.payloads.SignInPayload;
-import dev.thanhliem.oauth.models.payloads.SignUpPayload;
-import dev.thanhliem.oauth.models.payloads.UserPayload;
+import dev.thanhliem.oauth.models.payloads.*;
 import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -21,4 +18,6 @@ public interface UserService extends UserDetailsService {
     RequestTokenResponse signIn(SignInPayload payload);
 
     UserPayload resetPassword(ResetPasswordPayload payload);
+
+    UserPayload updatePassword(Long userId, UpdatePasswordPayload payload);
 }

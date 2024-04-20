@@ -2,10 +2,7 @@ package dev.thanhliem.oauth.apis;
 
 import dev.thanhliem.oauth.constants.Endpoints;
 import dev.thanhliem.oauth.models.entities.User;
-import dev.thanhliem.oauth.models.payloads.ResetPasswordPayload;
-import dev.thanhliem.oauth.models.payloads.SignInPayload;
-import dev.thanhliem.oauth.models.payloads.SignUpPayload;
-import dev.thanhliem.oauth.models.payloads.UserPayload;
+import dev.thanhliem.oauth.models.payloads.*;
 import dev.thanhliem.oauth.models.responses.RequestTokenResponse;
 import dev.thanhliem.oauth.services.resources.UserService;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +54,12 @@ public class UserApis {
     produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserPayload> resetPassword(@RequestBody ResetPasswordPayload payload) {
         return ResponseEntity.ok(service.resetPassword(payload));
+    }
+
+    @PutMapping(value = Endpoints.UserApi.UPDATE_PASSWORD,
+        headers = {Endpoints.HEADER_VERSION},
+        produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserPayload> updatePassword(@PathVariable(value = "id")Long id, @RequestBody UpdatePasswordPayload payload) {
+        return ResponseEntity.ok(service.updatePassword(id, payload));
     }
 }
