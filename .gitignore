@@ -51,3 +51,4 @@ replay_pid*
 
 # Log file
 *.log
+/.env
