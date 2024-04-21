@@ -11,8 +11,9 @@ services:
   server:
     build:
       context: .
-    ports:
+    ports: 
       - 8080:8080
+      - 12345:12345
     env_file:
       - ./.env
 

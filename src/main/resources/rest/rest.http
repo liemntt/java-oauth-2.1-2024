@@ -8,7 +8,7 @@ Content-Type : application/json
 
 {
     "usernameOrEmail": "thanhliem",
-    "password": "thanhliem"
+    "password": "thanhliem2"
 }
 ### token
 @token = Bearer {{tokenRequest.response.body.accessToken}}
