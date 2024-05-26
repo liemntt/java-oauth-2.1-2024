@@ -12,4 +12,8 @@ public final class ErrorMessages {
     public static final String RESOURCES_NOT_FOUND = "RESOURCES_NOT_FOUND";
     public static final String INVALID_PASSWORD = "Invalid password";
     public static final String INVALID_PAYLOAD = "Invalid payload";
+    public static final String INVALID_PARAMS = "Invalid params";
+    public static final String APPLICATION_NOT_FOUND = "Application not found";
+    public static final String INVALID_AUTHENTICATION = "Authentication invalid";
+    public static final String CANNOT_CREATE_APPLICATION = "Cannot insert application";
 }

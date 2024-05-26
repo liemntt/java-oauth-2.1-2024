@@ -1,6 +1,6 @@
 package dev.thanhliem.oauth.constants;
 
-public class Endpoints {
+public final class Endpoints {
 
     private Endpoints() {
         throw new IllegalStateException(Constants.UTILITY_CLASSES);
@@ -39,5 +39,17 @@ public class Endpoints {
             throw new IllegalStateException(Constants.UTILITY_CLASSES);
         }
         public static final String PATH = API_PREFIX + "/info";
+    }
+
+    public static class ApplicationApi {
+        private ApplicationApi() {
+            throw new IllegalStateException(Constants.UTILITY_CLASSES);
+        }
+
+        public static final String GET_ALL_APPS = API_PREFIX + "/users/{userId}/applications";
+        public static final String GET_APP_BY_ID = API_PREFIX + "/users/{userId}/applications/{id}";
+        public static final String CREATE_APP = API_PREFIX + "/users/{userId}/applications";
+        public static final String UPDATE_APP_BY_ID = GET_APP_BY_ID;
+        public static final String DELETE_APP_BY_ID = GET_APP_BY_ID;
     }
 }
