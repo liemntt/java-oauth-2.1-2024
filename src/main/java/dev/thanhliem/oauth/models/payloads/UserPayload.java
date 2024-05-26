@@ -16,4 +16,5 @@ public class UserPayload {
     private String username;
     private String email;
     private LocalDate birthday;
+    private Boolean isDel;
 }

@@ -1,5 +1,6 @@
 package dev.thanhliem.oauth.models.entities;
 
+import dev.thanhliem.oauth.models.jsonb.LovDetails;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role extends Entities {
+public class Lov extends Entities {
     private String name;
+    private LovDetails details;
 }
