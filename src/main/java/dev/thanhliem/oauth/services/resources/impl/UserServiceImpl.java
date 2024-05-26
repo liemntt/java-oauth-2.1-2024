@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -74,14 +75,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public RequestTokenResponse signIn(SignInPayload payload) {
         if (Utils.nullOrBlank(payload.usernameOrEmail())) {
-            throw new UsernameNotFoundException("Username or email cannot be null or blank");
+            throw new BadRequestException(ErrorCodes.BAD_CREDENTIALS, "Bad credentials");
         }
         if (Utils.nullOrBlank(payload.password())) {
             throw new ApplicationException(ErrorCodes.INVALID_PAYLOAD, "Password cannot be null or blank");
         }
         var mayBeUser = repository.findByUsernameOrEmail(payload.usernameOrEmail());
         if (mayBeUser.isEmpty()) {
-            throw new UsernameNotFoundException("Invalid Username/email");
+            throw new BadRequestException(ErrorCodes.BAD_CREDENTIALS, "Invalid Username/email");
         }
         var user = mayBeUser.get();
         if (passwordEncoder.matches(payload.password(), user.getPassword())) {
@@ -97,7 +98,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserPayload resetPassword(ResetPasswordPayload payload) {
-        if (payload == null || Utils.nullOrEmpty(payload.getUsernameOrEmail()) || payload.getBirthDate() == null) {
+        var mayBeInvalid = Optional.ofNullable(payload)
+            .filter(p -> Utils.nonBlank(p.getUsernameOrEmail()))
+            .filter(p -> p.getBirthDate() != null);
+        if (mayBeInvalid.isEmpty()) {
             throw new BadRequestException(ErrorCodes.INVALID_PAYLOAD, ErrorMessages.INVALID_PAYLOAD, "Invalid payload %s".formatted(Utils.toJson(payload)));
         }
 
@@ -106,7 +110,7 @@ public class UserServiceImpl implements UserService {
             throw new BadRequestException(ErrorCodes.USER_NOT_FOUND, ErrorMessages.THE_USER_IS_NOT_FOUND.formatted(payload.getUsernameOrEmail()));
         }
         var user = mayBeUser.get();
-        if (user.getBirthday().isEqual(payload.getBirthDate())) {
+        if (payload.getBirthDate().isEqual(user.getBirthday())) {
             log.info("[UserService.resetPassword] found matched user {}.", Utils.toJson(user));
             var newPassword = Utils.generatePassword(15);
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -121,7 +125,11 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserPayload updatePassword(Long id, UpdatePasswordPayload payload) {
-        if (payload == null || Utils.nullOrEmpty(payload.oldPassword()) || Utils.nullOrEmpty(payload.newPassword()) || id == null) {
+        var mayBeInvalid = Optional.ofNullable(payload)
+            .filter(p -> Utils.nonBlank(p.oldPassword()))
+            .filter(p -> Utils.nonBlank(p.newPassword()))
+            .filter(p -> id != null);
+        if (mayBeInvalid.isEmpty()) {
             var payloadStr = Utils.toJson(payload);
             log.warn("[updatePassword] invalid payload {}", payloadStr);
             throw new BadRequestException(ErrorCodes.INVALID_PAYLOAD, "Invalid payload", "Invalid payload %s".formatted(payloadStr));
@@ -140,6 +148,14 @@ public class UserServiceImpl implements UserService {
             return mapper.toPayload(user);
         }
         throw new BadRequestException(ErrorCodes.PASSWORD_MISMATCH, ErrorMessages.INVALID_PASSWORD, "Your old password not matched");
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        if (Utils.nullOrBlank(username)) {
+            throw new BadRequestException(ErrorCodes.BAD_CREDENTIALS, "Username or email cannot be null or blank");
+        }
+        return repository.findByUsernameOrEmail(username);
     }
 
     @Override

@@ -3,11 +3,11 @@
 <mapper namespace="dev.thanhliem.oauth.repositories.mappers.RoleRepository">
     <select id="findByUserId" resultType="dev.thanhliem.oauth.models.entities.Role">
         SELECT r.name FROM public.role r
-                               JOIN user_roles ur on r.id = ur.role_id
+                               JOIN user_roles ur on r.id = ur.role_id AND r.isDel = false AND ur.isDel = false
         WHERE ur.user_id = #{userId}
     </select>
     <select id="findByName" resultType="dev.thanhliem.oauth.models.entities.Role">
         SELECT r.* FROM public.role r
-        WHERE lower(r.name) = lower(#{name})
+        WHERE lower(r.name) = lower(#{name}) AND r.isDel = false
     </select>
 </mapper>

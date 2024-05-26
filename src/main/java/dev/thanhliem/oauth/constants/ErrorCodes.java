@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ErrorCodes {
     BAD_REQUEST,
+    BAD_CREDENTIALS,
     UNAUTHORIZED,
     INVALID_PAYLOAD,
     INVALID_PARAMS,

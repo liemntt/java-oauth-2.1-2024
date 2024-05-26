@@ -21,13 +21,13 @@
             "id" = #{user.id}
     </update>
     <select id="getAllUsers" resultType="dev.thanhliem.oauth.models.entities.User">
-        SELECT * FROM public.user
+        SELECT * FROM public.user WHERE isDel = false
     </select>
     <select id="find" resultType="dev.thanhliem.oauth.models.entities.User">
-        SELECT * FROM public.user WHERE id = #{id} LIMIT 1
+        SELECT * FROM public.user WHERE id = #{id} AND isDel = false LIMIT 1
     </select>
     <select id="findByUsernameOrEmail" resultType="dev.thanhliem.oauth.models.entities.User">
-        SELECT * FROM public.user WHERE username = #{username} OR email = #{username} LIMIT 1
+        SELECT * FROM public.user WHERE username = #{username} OR email = #{username} AND isDel = false LIMIT 1
     </select>
     <select id="isExistUsernameOrEmail" resultType="java.lang.Boolean">
         SELECT 1
@@ -35,5 +35,6 @@
             public.user
         WHERE
             username = #{username} OR email = #{email}
+            AND isDel = false
     </select>
 </mapper>

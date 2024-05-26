@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="dev.thanhliem.oauth.repositories.mappers.ApplicationRepository">
+    <insert id="create" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO public.applications (name, type, client_id, client_secret, details, created_by, created_date, updated_by, updated_date)
+        VALUES (
+                   #{application.name},
+                   #{application.type},
+                   #{application.clientId},
+                   #{application.clientSecret},
+                   #{application.details, jdbcType=OTHER, javaType=String, typeHandler=dev.thanhliem.oauth.configurations.ds.JsonTypeHandler},
+                   #{application.createdBy},
+                   #{application.createdDate},
+                   #{application.updatedBy},
+                   #{application.updatedDate}
+               )
+    </insert>
+    <update id="update"></update>
+    <delete id="delete"></delete>
+    <select id="getByUserId" resultType="dev.thanhliem.oauth.models.entities.Application">
+        SELECT * FROM public.applications app WHERE app.userId = #{userId} AND app.isDel = false
+    </select>
+    <select id="getById" resultType="dev.thanhliem.oauth.models.entities.Application">
+        SELECT * FROM public.applications app WHERE app.userId = #{userId} AND app.id = #{id}
+        AND app.isDel = false
+        LIMIT 1
+    </select>
+</mapper>

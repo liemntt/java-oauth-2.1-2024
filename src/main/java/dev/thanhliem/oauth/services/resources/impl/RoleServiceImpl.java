@@ -36,7 +36,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> findUserRoles(Long userId) {
-        if (userId == null || userId <= 0) {
+        var mayBeUserId = Optional.ofNullable(userId).filter(id -> id > 0);
+        if (mayBeUserId.isEmpty()) {
             log.warn("[RoleService.findUserRoles] Invalid userId");
             return Collections.emptyList();
         }
