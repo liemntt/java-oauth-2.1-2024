@@ -15,5 +15,4 @@ public enum ErrorCodes {
     ROLES_NOT_FOUND,
     APPLICATION_NOT_FOUND,
     CANNOT_CREATE_APPLICATION
-    ;
 }
