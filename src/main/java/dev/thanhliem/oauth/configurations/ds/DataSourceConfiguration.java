@@ -2,6 +2,7 @@ package dev.thanhliem.oauth.configurations.ds;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.logging.log4j2.Log4j2Impl;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -36,7 +37,9 @@ public class DataSourceConfiguration {
         }
 
         SqlSessionFactory factory = factoryBean.getObject();
-        Objects.requireNonNull(factory).getConfiguration().setMapUnderscoreToCamelCase(true);
+        var configuration = Objects.requireNonNull(factory).getConfiguration();
+        configuration.setMapUnderscoreToCamelCase(true);
+        configuration.setLogImpl(Log4j2Impl.class);
         log.info("[DataSourceConfiguration] Initializing sessionFactory");
         return factory;
     }
