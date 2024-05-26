@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="CONSOLE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n"/>
+    <property name="CONSOLE_LOG_CHARSET" value="${CONSOLE_LOG_CHARSET:-${file.encoding:-UTF-8}}"/>
+    <property name="CONSOLE_LOG_THRESHOLD" value="${CONSOLE_LOG_THRESHOLD:-TRACE}"/>
+    <property name="LOG_DIR" value="/var/logs/app"/>
+
+    <!-- Define the appender that writes logs to the console -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${CONSOLE_LOG_THRESHOLD}</level>
+        </filter>
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}}</pattern>
+            <charset>${CONSOLE_LOG_CHARSET}</charset>
+        </encoder>
+    </appender>
+
+<!--    &lt;!&ndash; Define the appender that writes logs to a file &ndash;&gt;-->
+<!--    <appender name="FILE" class="ch.qos.logback.core.FileAppender">-->
+<!--        <file>${LOG_DIR}/app.log</file>-->
+<!--        <append>true</append>-->
+<!--        <encoder>-->
+<!--            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
+
+<!--    &lt;!&ndash; Define a rolling file appender that rolls over the log file at specific intervals &ndash;&gt;-->
+<!--    <appender name="ROLLING_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
+<!--        <file>${LOG_DIR}/app-rolling.log</file>-->
+<!--        <append>true</append>-->
+<!--        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">-->
+<!--            &lt;!&ndash; daily rollover &ndash;&gt;-->
+<!--            <fileNamePattern>${LOG_DIR}/app-rolling.%d{yyyy-MM-dd}.log</fileNamePattern>-->
+<!--            &lt;!&ndash; keep 30 days' worth of history &ndash;&gt;-->
+<!--            <maxHistory>30</maxHistory>-->
+<!--        </rollingPolicy>-->
+<!--        <encoder>-->
+<!--            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>-->
+<!--        </encoder>-->
+<!--    </appender>-->
+
+    <!-- Set the root level logger to INFO and attach appenders -->
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+<!--        <appender-ref ref="FILE"/>-->
+<!--        <appender-ref ref="ROLLING_FILE"/>-->
+    </root>
+    <logger name="org.apache.ibatis" level="debug" additivity="false">
+        <appender-ref ref="CONSOLE" />
+    </logger>
+    <logger name="org.springframework.web" level="DEBUG"/>
+    <logger name="dev.thanhliem.oauth" level="DEBUG"/>
+</configuration>
