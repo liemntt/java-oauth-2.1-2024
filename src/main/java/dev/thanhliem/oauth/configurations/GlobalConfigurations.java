@@ -1,5 +1,9 @@
 package dev.thanhliem.oauth.configurations;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import dev.thanhliem.oauth.properties.AuthenticateProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -25,5 +29,15 @@ public class GlobalConfigurations {
     public AuthenticateProperties authenticateProperties() {
         log.info("[GlobalConfigurations] Initializing authentication properties");
         return new AuthenticateProperties();
+    }
+
+    @Bean
+    public ObjectMapper jsonMapper() {
+        log.info("[GlobalConfigurations] Initializing default json mapper");
+        return JsonMapper.builder()
+            .findAndAddModules()
+            .configure(SerializationFeature.WRITE_DURATIONS_AS_TIMESTAMPS, true)
+            .configure(JsonGenerator.Feature.IGNORE_UNKNOWN, true)
+            .build();
     }
 }
