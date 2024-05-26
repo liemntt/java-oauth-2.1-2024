@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -25,8 +26,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        String token = getToken(request);
-        if (Utils.nonEmpty(token) && provider.isTokenValid(token)) {
+        var mayBeToken = getToken(request);
+        if (mayBeToken.isPresent() && provider.isTokenValid(mayBeToken.get())) {
+            var token = mayBeToken.get();
             String username = provider.getUsername(token);
             var userDetails = userService.loadUserByUsername(username);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
@@ -37,11 +39,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private String getToken(HttpServletRequest request) {
+    private Optional<String> getToken(HttpServletRequest request) {
         var token = request.getHeader(Constants.Headers.AUTHORIZATION);
         if (Utils.nonEmpty(token) && token.startsWith("Bearer")) {
-            return token.substring(7);
+            return Optional.of(token.substring(7));
         }
-        return null;
+        return Optional.empty();
     }
 }

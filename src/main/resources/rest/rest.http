@@ -43,7 +43,7 @@ Content-Type : application/json
 # @prompt newPassword newPassword need to be input
 
 
-PUT  {{host}}/users/{{id}}/password
+PUT  {{host}}/users/{{id}}/password HTTP/1.1
 X-Api-Versioning : {{version}}
 Content-Type : application/json
 Authorization: {{token}}
@@ -51,4 +51,30 @@ Authorization: {{token}}
 {
     "oldPassword": "{{oldPassword}}",
     "newPassword": "{{newPassword}}"
+}
+
+
+### list users
+GET  {{host}}/users HTTP/1.1
+X-Api-Versioning : {{version}}
+Content-Type : application/json
+Authorization: {{token}}
+
+{}
+
+### create application
+POST {{host}}/users/4/applications HTTP/1.1
+X-Api-Versioning: {{version}}
+Content-Type: application/json
+Authorization: {{token}}
+
+{
+    "name": "first-app",
+    "type": "WEB_APP",
+    "clientId": "abc",
+    "details": {
+        "requireConsent" : true,
+        "requirePKCE": true,
+        "logoUrl": "This is logo url"
+    }
 }
